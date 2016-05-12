@@ -14,8 +14,9 @@ Etudiants : Bertrand - Bruchon
 #include <sys/wait.h>
 #include <sys/types.h>
 
+int compteur = 0;
+
 void increment_sec (int id) { //Fonction qui s'activera à la réception d'un signal pour incrémenter les secondes
-  static int compteur = 0;
   compteur++;
   if (compteur == 60){
     compteur = 0;
@@ -25,7 +26,6 @@ void increment_sec (int id) { //Fonction qui s'activera à la réception d'un si
   }
 
 void increment_min (int id) { //Fonction qui s'activera à la réception d'un signal pour incrémenter les minutes
-  static int compteur = 0;
   compteur++;
   if (compteur == 60){
     compteur = 0;
@@ -35,15 +35,14 @@ void increment_min (int id) { //Fonction qui s'activera à la réception d'un si
 }
 
 void increment_h (int id) { //Fonction qui s'activera à la réception d'un signal pour incrémenter le heures
-  static int compteur = 0;
   compteur++;
   printf("%d\n", compteur);
 }
 
-/** Remarque : On aura pu utilise une seule fonction increment mais cela compliquait l'affichage du temps (on devrait utiliser des  globales**/
+/** Remarque : On aura pu utilise une seule fonction increment mais cela compliquait l'affichage du temps**/
 
 
-int main (void)
+int main (int argc, char* argv[])
 {
   pid_t pid;
 
@@ -60,6 +59,8 @@ int main (void)
     }
 
     else if (pid == 0) { //Comptage des secondes
+      if (argc >= 4)      
+	compteur = atoi(argv[3]);
       signal(SIGALRM, increment_sec);
       while(1) {
 	alarm(1);
@@ -68,11 +69,15 @@ int main (void)
     }
 
     else { //Comptage des minutes 
+      if (argc >= 3)      
+	compteur = atoi(argv[2]);
       signal(SIGALRM, increment_min);
       while(1);
     }
   }
   else { //Comptage des heures
+    if (argc >= 2)      
+	compteur = atoi(argv[1]);
     signal(SIGALRM, increment_h);
     while(1);
   }
