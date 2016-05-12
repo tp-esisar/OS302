@@ -40,7 +40,7 @@ void increment_h (int id) { //Fonction qui s'activera à la réception d'un sign
   printf("%d\n", compteur);
 }
 
-/** Remarque : On aura pu utilise une seule fonction increment mais cela compliquait l'affichage **/
+/** Remarque : On aura pu utilise une seule fonction increment mais cela compliquait l'affichage du temps (on devrait utiliser des  globales**/
 
 
 int main (void)
