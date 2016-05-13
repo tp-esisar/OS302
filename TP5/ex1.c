@@ -23,13 +23,17 @@ int main(int argc, char* argv[]) {
   pipe(p);//Création du Pipe
 
   if(fork() == 0) {  //fils
+    close(p[1]);
     dup2(p[0],STDIN_FILENO); //On défini le pipe comme l'entrée standard du fils
     system(argv[2]);
+    close(p[0]);
   }
 
   else { //père
+    close(p[0]);
     dup2(p[1],STDOUT_FILENO); //On redirige la sortie de l'exécution du père dans le pipe
     system(argv[1]);
+    close(p[1]);
   }
   
     
