@@ -9,7 +9,7 @@
 #define TAILLE_MAX 100
 
 int main (void) {
-	char chemin[] = "/tmp/fifo";	
+	char chemin[] = "/tmp/fifo1";	
 	char chaine[TAILLE_MAX] = "";	
 	int pipe;
 
