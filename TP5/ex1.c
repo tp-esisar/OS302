@@ -20,15 +20,15 @@ int main(int argc, char* argv[]) {
     exit(42);
   }
   int p[2];
-  pipe(p);
-  if(fork() == 0) {
-    //fils
-    dup2(p[0],STDIN_FILENO);
+  pipe(p);//Création du Pipe
+
+  if(fork() == 0) {  //fils
+    dup2(p[0],STDIN_FILENO); //On défini le pipe comme l'entrée standard du fils
     system(argv[2]);
   }
-  else {
-    //père
-    dup2(p[1],STDOUT_FILENO);
+
+  else { //père
+    dup2(p[1],STDOUT_FILENO); //On redirige la sortie de l'exécution du père dans le pipe
     system(argv[1]);
   }
   
