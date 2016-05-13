@@ -2,7 +2,7 @@ COMP = gcc
 OPTIONS =
 OPTIONS_CC = -g -Wall
 
-ex%.e: ex%.o
+%.e: %.o
 	$(COMP) -o $@ $^ $(OPTIONS)
 
 	
