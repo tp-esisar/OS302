@@ -29,6 +29,7 @@ int main (int argc, char* argv[]) {
 		exit(-1);
 	}
 
+//Ouverture du Pipe en mode écriture (opération non bloquante)
 	if((pipe = open (chemin, O_WRONLY|O_NDELAY)) == -1)
 	{
 		perror("Impossible d'ouvrir le tube. Le serveur est t-il bien lancé ?");

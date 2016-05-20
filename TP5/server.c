@@ -1,7 +1,8 @@
 /* Exercice 2 : Communication client / serveur par PIPE
 Usage (sans arguments) : ./server.e
 
-Le serveur
+Réalisation d'un modèle client/serveur avec deux processus en utilisant un tube nommé
+pour la Communication, ainsi que les fonctions read et write
 
 Etudiants : Bertrand - Bruchon
 */
