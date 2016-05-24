@@ -2,6 +2,14 @@
  * OS302 - TP7 - Exercice 2                                          *
  * Utilisation des segments de memoire partagee                      *
  *********************************************************************/
+/*
+Exercice 2
+Usage: ./exo2.e
+
+Créé un segment partagé et des processus père et fils.
+Le père écrit un message dans le segment partagé, et le fils l'affiche à l'écran.
+
+*/
 #include <string.h>
 #include <unistd.h>
 #include "segment_memoire.h"
