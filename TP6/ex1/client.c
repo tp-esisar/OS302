@@ -6,7 +6,6 @@ le Serveur y réponds par la même file.
 Etudiants : Bertrand - Bruchon
 */
 
-
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -47,23 +46,22 @@ int main(int argc, char const *argv[])
      printf("CLIENT %d: preparation du message contenant l'operation suivante: %d %c %d\n",
                 getpid(), atoi(argv[1]), argv[2][0], atoi(argv[3]));
         
-        /* On prepare un message de type 1 � envoyer au serveur
+        /* On prepare un message de type 1 a envoyer au serveur
             avec les informations necessaires */        
-        /* A COMPLETER */
         msg.operation = argv[2][0];
         msg.pidClient = getpid();
         msg.type = 1;
         msg.operande1 = atoi(argv[1]);
         msg.operande2 = atoi(argv[3]);
         
-        
         /* envoi du message */
         int sndErr = msgsnd(msg_id, &msg, sizeof(struct msg_struct)-sizeof(long), 0);
         printf("Envoi du message au serveur, code retour: [%d]\n",sndErr);
 
         /* reception de la reponse */
-        while(msgrcv(msg_id, &msg, sizeof(struct msg_struct)-sizeof(long), getpid(), 0) == -1);
+        msgrcv(msg_id, &msg, sizeof(struct msg_struct)-sizeof(long), getpid(), 0);
 
         printf("CLIENT: resultat recu depuis le serveur : %d\n", msg.operande1);
         return 0;
 }
+

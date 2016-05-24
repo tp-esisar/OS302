@@ -86,7 +86,6 @@ int main(int argc, char const *argv[])
 
 void raz_msg(int signal)
 {
-  //struct msgid_ds tab;
   printf("Suppression de la file de message!\n");
   msgctl(msg_id, IPC_RMID, NULL);
   exit(0);
