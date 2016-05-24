@@ -11,5 +11,5 @@ OPTIONS_CC = -g -Wall
 
 
 clean :
-	$(RM) *.o *.e
+	rm *.o *.e
 

@@ -1,3 +1,12 @@
+/* Exercice 2 : Communication par files de messages
+Usage (sans argument) : ./serveur.e
+
+Une serveur ouvre la file de message sur laquelle les clients vont envoyer les chaines à traduire. Le serveur boucle pour répondre à toutes les requettes (jusqu'à qu'il recoit "@").
+On converti les chaine de caractères en majuscule et on renvoie dans une autre file de message (identifié par le pid) la nouvelle chaine au client.
+
+Etudiants : Bertrand - Bruchon
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -11,53 +20,65 @@
 #include "calcul.h"
 
 
-void raz_msg(int);                          /* routine de traitement des signaux */
+void raz_msg(int);				/* routine de traitement des signaux */
 
-int msg_id;                                     /* identificateur de la file de messages */
+int msg_id;					/* identificateur de la file de messages */
 
 int main(int argc, char const *argv[])
 {       
-        struct msg_struct msg;
+	struct msg_struct msg;			//Structure de donnée qui contiendra les messages (reçu et émis)
 
-        int i_sig;
-
-        /* liberer la zone de messages sur reception
-           de n'importe quel signal */
-        for (i_sig = 0; i_sig < NSIG; i_sig++)
-        {
-             signal(i_sig, raz_msg);
-        }
-
-        msg_id = msgget(4224, IPC_CREAT | 666);
+	/* Définition du comportement qui permet de liberer la zone de messages sur reception de n'importe quel signal */
+	int i_sig;
+	for (i_sig = 0; i_sig < NSIG; i_sig++)
+		signal(i_sig, raz_msg);
+	
+	/*On ouvre la file de message par laquelle les clients vont envoyer leur chaine de caractère à traduire*/
+	msg_id = msgget(MSGKEY, 0666|IPC_CREAT);
 	if (msg_id == -1)  {
 		perror("File de message");
 		exit(-1);
 	}
-        printf("SERVEUR: pret!\n");
+	printf("SERVEUR: pret!\n");
 
-        while(1)
-        {
-             int cle2, i, msg_rep;
-	     /* reception */
-             if (msgrcv(msg_id, &msg, sizeof(struct msg_struct), 0,0) != -1) {
-		     printf("SERVEUR: reception d'une requete de la part de: %d\n", msg.pid);
-	 
-		     for (i=0; i<strlen(msg.message); i++)
+	while(1)
+	{
+		int i, msg_rep;
+
+		//On attend de recevoir un message d'un client
+		msgrcv(msg_id, &msg, sizeof(struct msg_struct), 42,0);
+		printf("SERVEUR: reception d'une requete de la part de: %d\n", msg.pid);
+		
+		//On converti le message en majuscule
+		for (i=0; i<strlen(msg.message); i++)
 			msg.message[i] = toupper(msg.message[i]);
 
-		     cle2 = ftok("serveur.c", msg.pid);
-		     msg_rep = msgget(cle2, IPC_CREAT | 666);
-		     msgsnd(msg_rep, &msg, sizeof(struct msg_struct), 0);  
-		     close(msg_rep);
-	     }
-        }
-        return 0;
+		//On ouvre la file de message par laquelle on va envoyer la réponse au client (clé : pid du client)
+		msg_rep = msgget(msg.pid, 0666|IPC_CREAT);
+		if (msg_rep == -1) {
+			perror("Impossible d'envoyer la réponse !");
+			exit(-1);
+		}
 
+		//On envoie la réponse au client (et on vérifie que le message est bien envoyé
+		msg.pid = getpid();
+		if (msgsnd(msg_rep, &msg, sizeof(struct msg_struct), 0) == -1) {
+			perror("Impossible d'envoyer le message");
+			exit(-1);
+		} 
+
+		//Dans le cas où le message est "@", on génère un signal, ce qui va supprimer la file de message et fermer le programme.
+		if (strcmp(msg.message, "@") == 0)
+			raise(SIGINT);
+	}
+
+	return 0;
 }
 
-void raz_msg(int signal)
+void raz_msg(int signal) 		
 {
         printf("Suppression de la file de message!\n");
-        msgctl(msg_id, IPC_RMID, NULL);
+        msgctl(msg_id, IPC_RMID, NULL); //Fonction permettent de libérer la file de message du serveur
         exit(0);
 }
+
