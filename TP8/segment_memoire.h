@@ -1,7 +1,7 @@
 /*********************************************************************
- * OS302 - TP7 - Exercice 1                                          *
- * Utilisation des segments de memoire partagee                      *
+ * OS302 - Utilisation des segments de memoire partagee              *
  *********************************************************************/
+
 #ifndef SEGMENT_MEM_H
 #define SEGMENT_MEM_H
 
@@ -32,3 +32,4 @@ int afficher_info_segment(int shmid);
 int detruire_segment(int shmid);
 
 #endif  //SEGMENT_MEM_H
+
