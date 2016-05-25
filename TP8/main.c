@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/sem.h>
+#include <sys/ipc.h>
+#include <string.h>
 #include "segment_memoire.h"
 
 #define NB_FILS 6
@@ -23,6 +26,8 @@ int main (int argc, char* argv[])
 	char* nom = "main.c";
 	pid_t *mem;    					// pointeur vers le segment memoire
 	key_t cle;
+	int shmid;
+	int i;
 
 	//Creation du segment de memoire partagee
 	shmid = cree_segment(2*sizeof(pid_t),nom,42);
@@ -56,17 +61,17 @@ int main (int argc, char* argv[])
 	// --- Partie du programme pour le PERE ---
 	if (pere == getpid()) { 
 		mem = shmat(shmid,NULL,SHM_RDONLY);
-		int i = 0;
+		i = 0;
 		while(i<NB_FILS) {
 			sleep(1);
-			int nbCient = 2 - semctl(semid,0,GETVAL);
-			i+=nbClient
+			int nbClient = 2 - semctl(semid,0,GETVAL);
+			i+=nbClient;
 			if(nbClient > 0) {
 				//on monte
 				if(nbClient == 1) {
 					kill(mem[1],SIGUSR1);
 				}
-				else if(nbCient == 2) {
+				else if(nbClient == 2) {
 					kill(mem[1],SIGUSR1);
 					kill(mem[0],SIGUSR1);
 				}
@@ -84,29 +89,29 @@ int main (int argc, char* argv[])
 		struct sembuf operation;
 		int pid = getpid();
 		int numero;
-		sleep(3);
-
-		signal(SIGUSR1,descente);
 		
+		signal(SIGUSR1,descente);
+		sleep(3);
+				
 		operation.sem_num = 0;
 		operation.sem_op = -1;
 		operation.sem_flg = 0;
-		if (semop(semid, &operation, 1) == -1) {
-			fprintf(stderr,"erreur de semaphore");
+		if ((numero = semop(semid, &operation, 1)) == -1) {
+			perror("erreur de semaphore\n");
 			exit(EXIT_FAILURE);
 		}
-		numero = semctl(semid, 0, GETVAL);
-		printf("Fils %d : Je monte avec le numero %d", i, numero);
+		//numero = semctl(semid, 0, GETVAL);
+		printf("Fils %d : Je monte avec le numero %d\n", i, numero);
 
-		if ((mem = shmat(shmid,NULL,0)) == (char*)-1) {
+		if ((mem = shmat(shmid,NULL,0)) == (pid_t*)-1) {
 			fprintf(stderr,"erreur ouverture segment");
 			exit(EXIT_FAILURE);
 		}
 		memcpy(mem + numero*sizeof(pid), &pid, sizeof(pid));
-		printf("Fils %d : J'ai ecris mon pid %d", i, pid);
+		printf("Fils %d : J'ai ecris mon pid %d\n", i, pid);
 		shmdt(mem);
 		
-		while(descendre == 0);
+		/*while(descendre == 0);
 
 		operation.sem_num = 0;
 		operation.sem_op = 1;
@@ -114,8 +119,8 @@ int main (int argc, char* argv[])
 		if (semop(semid, &operation, 1) == -1) {
 			fprintf(stderr,"erreur de semaphore");
 			exit(EXIT_FAILURE);
-		}
-		printf("Fils %d : Je descend", i);
+		}*/
+		printf("Fils %d : Je descend\n", i);
 	}
 	
 	return 0;
