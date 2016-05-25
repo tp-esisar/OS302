@@ -21,7 +21,7 @@ int main (int argc, char* argv[])
 	pid_t pere = getpid();
 	int semid;
 	char* nom = "main.c";
-	char *mem;    					// pointeur vers le segment memoire
+	pid_t *mem;    					// pointeur vers le segment memoire
 	key_t cle;
 
 	//Creation du segment de memoire partagee
@@ -57,8 +57,26 @@ int main (int argc, char* argv[])
 	if (pere == getpid()) { 
 		mem = shmat(shmid,NULL,SHM_RDONLY);
 		int i = 0;
-		while(
-		
+		while(i<NB_FILS) {
+			sleep(1);
+			int nbCient = 2 - semctl(semid,0,GETVAL);
+			i+=nbClient
+			if(nbClient > 0) {
+				//on monte
+				if(nbClient == 1) {
+					kill(mem[1],SIGUSR1);
+				}
+				else if(nbCient == 2) {
+					kill(mem[1],SIGUSR1);
+					kill(mem[0],SIGUSR1);
+				}
+			}
+			
+			
+		}
+		shmdt(mem);
+		detruire_segment(shmid);
+		semctl(semid,0,IPC_RMID);
 	}
 
 	// --- Partie du programme pour les FILS ---
