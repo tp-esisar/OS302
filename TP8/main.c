@@ -45,6 +45,7 @@ int main (int argc, char* argv[])
 	else {
 		struct sembuf operation;
 		int pid = getpid();
+		int numero;
 		sleep(1);
 
 		signal(SIGUSR1,descente);
@@ -56,13 +57,14 @@ int main (int argc, char* argv[])
 			fprintf(stderr,"erreur de semaphore");
 			exit(EXIT_FAILURE);
 		}
-		printf("Fils %d : Je monte avec le numero %d", i, operation.sem_num);
+		numero = semctl(semid, 0, GETVAL, NULL);
+		printf("Fils %d : Je monte avec le numero %d", i, numero);
 
 		if ((mem = shmat(shmid,NULL,0)) == (char*)-1) {
 			fprintf(stderr,"erreur ouverture segment");
 			exit(EXIT_FAILURE);
 		}
-		memcpy(mem + (operation.sem_num+1)*sizeof(pid), &pid, sizeof(pid));
+		memcpy(mem + (numero+1)*sizeof(pid), &pid, sizeof(pid));
 		printf("Fils %d : J'ai ecris mon pid %d", i, pid);
 		shmdt(mem);
 		
@@ -76,17 +78,6 @@ int main (int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 		printf("Fils %d : Je descend", i);
-		
-		
-		
-		
-		
-		
-
-
-
-		
-
 	}
 	
 	return 0;
