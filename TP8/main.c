@@ -7,11 +7,13 @@ Les ouvriers sont représenté par des processus fils et le père gère l'ascens
 Pour cela nous avons utilisé un sémaphore de valeur 2, qui ne laisse donc passer que 2 processus fils.
 Afin de savoir qui est monté, on utilise un segment de mémoire partagé sur lequel les 2 clients dans l'ascenseur vont pour noter leur pid.
 Le père pourra alors leur envoyer un signal via ce pid.
-Problème : Comme ils sont 2, comment ne pas écrire au même endroit dans le SMP. Pour cela nous avons utiliser un second SMP d'une valeur de 1.  Le premier qui décroche ce sémaphore écrit dans la première case du SMP, le second ne pourra pas avoir ce semaphore, et comme l'opération est non bloquante, il saura qu'il faut écrire dans la seconde case mémoire.
+Problème : Comme ils sont 2, comment ne pas écrire au même endroit dans le SMP. Pour cela nous avons utiliser un second SMP d'une valeur de 1.  
+	Le premier qui décroche ce sémaphore écrit dans la première case du SMP 
+	Le second ne pourra pas avoir ce semaphore, et comme l'opération est non bloquante, il saura qu'il faut écrire dans la seconde case mémoire.
 
 Afin de simuler les durées déplacements et de respecter l'ordre des montées et des descentes, nous avons utiliser des "sleep".
 Pour les SMP, nous avons utilisés les fonctions du TP précédent.
-Pour les sémaphores nous avons défini une fonction permettant de réalisé (de manière sécurée) les opérations sur les sémaphores
+Pour les sémaphores nous avons défini une fonction permettant de réaliser (de manière sécurée) les opérations sur les sémaphores
 
 Etudiants : Bertrand - Bruchon
 */
@@ -114,7 +116,7 @@ int main (int argc, char* argv[])
 			if(nbClient > 0) {
 				printf("===== L'ascenseur monte ! ==========");
 				if(nbClient == 1) { //Si on a qu'un seul client dans l'ascenseur, on ne fait descendre que lui
-					printf("===> Le pid %d peut descendre \n", mem[1]);
+					printf("===> Le pid %d peut descendre \n", mem[0]);
 					while(kill(mem[0],SIGUSR1)==-1);
 				}
 				else if(nbClient == 2) { //Sinon on fait descendre les 2
